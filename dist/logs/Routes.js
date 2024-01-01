@@ -1,0 +1,11 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.logRoutes = void 0;
+const express = require("express");
+const LogController_1 = require("./LogController");
+const path = require("path");
+exports.logRoutes = express.Router();
+const p = path.resolve(process.cwd() + '/src/logs/index.html');
+console.log(p);
+exports.logRoutes.use('/', express.static(p));
+exports.logRoutes.get('/list', LogController_1.getList);

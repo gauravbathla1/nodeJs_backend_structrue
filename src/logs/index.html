@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Logs</title>
+    <style>
+        body {
+            margin: 0% !important;
+            padding: 0% !important;
+        }
+
+        .header {
+            padding: 3px 20px;
+            height: 55px;
+            background-color: rgb(34, 7, 124);
+            display: flex;
+            /* grid-template-columns: 2fr 3fr 2fr; */
+            position: sticky;
+            top: 0px;
+            z-index: 999;
+        }
+
+        .header-item {
+            margin-left: 20px;
+            display: flex;
+        }
+
+        .border-left {
+            border-left: 1px solid #fff;
+        }
+
+
+        .header-item h3 {
+            color: white;
+            margin-left: 10px;
+            padding: 0% !important;
+        }
+
+
+
+        .logs-count {
+            display: flex;
+        }
+
+        .filter {
+            height: 60px;
+            display: flex;
+            justify-content: flex-start;
+            align-items: center;
+        }
+
+        .filter h3 {
+            display: inline;
+        }
+
+        .filter select {
+            outline: none;
+            margin-left: 5px;
+        }
+
+        #searchApiBtn {
+            cursor: pointer;
+        }
+
+        .container {
+            width: 95vw;
+            margin: auto;
+            overflow-x: hidden;
+            box-sizing: border-box;
+        }
+
+        .log {
+            margin-top: 5px;
+            /* padding: 2px; */
+        }
+
+        .mid,
+        .method,
+        .status {
+            padding: 9px 0px;
+        }
+
+        .api {
+            background-color: #e0f6fb;
+            position: relative;
+            display: grid;
+            grid-template-columns: 100px auto 100px;
+            gap: 10px;
+        }
+
+
+        .method {
+            width: 100px;
+            border-radius: 5px 0px 0px 0px;
+            text-align: center;
+            font-weight: bold;
+            color: white;
+            box-sizing: border-box;
+        }
+
+        .mid {
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .api-url {
+            font-style: italic;
+        }
+
+        .status {
+            color: white;
+            width: 100px;
+            border-radius: 0px 5px 0px 0px;
+            text-align: center;
+            font-weight: bold;
+            box-sizing: border-box;
+        }
+
+        .failed {
+            background-color: rgb(143, 148, 5);
+        }
+
+        .error {
+            background-color: rgb(238, 18, 18);
+        }
+
+        .success {
+            background-color: rgb(15, 140, 15);
+        }
+
+        .info {
+            background-color: rgb(9, 158, 207);
+        }
+
+        .get {
+            background-color: #4361ee;
+        }
+
+        .post {
+            background-color: #fca311;
+        }
+
+        .put {
+            background-color: #b5179e;
+        }
+
+        .patch {
+            background-color: #f07167;
+        }
+
+        .delete {
+            background-color: #d00000;
+        }
+
+        .content {
+            border: 1px solid rgb(93, 112, 234);
+            border-top: none;
+            border-radius: 0px 0px 5px 5px;
+            padding: 5px;
+        }
+
+        .data-box {
+            margin-top: 2px;
+            /* border-radius: 10px; */
+            padding: 1px 5px;
+            position: relative;
+            background-color: #edede9;
+            max-height: 400px;
+            overflow-y: scroll;
+        }
+
+        .p-json {
+            width: 90vw;
+        }
+
+        .msg-box {
+            padding: 5px 10px;
+        }
+
+        .copy {
+            position: absolute;
+            top: 2px;
+            right: 5px;
+        }
+
+        .copy button {
+            cursor: pointer;
+        }
+
+        .footer {
+            /* width: 100%; */
+            /* height: 30px; */
+            background-color: black;
+            color: white;
+            position: fixed;
+            bottom: 0% !important;
+            right: 20px !important;
+            padding: 1px 20px;
+            box-sizing: border-box;
+            border-radius: 10px 10px 0px 0px;
+            font-size: 14px;
+        }
+
+        .heart {
+            color: red;
+            font-size: 10px;
+            margin: 0px 3px;
+        }
+
+        .mc {
+            font-weight: bold;
+            color: #4361ee;
+            text-decoration: none;
+        }
+
+        .mc:hover {
+            text-decoration: none;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="header">
+        <div class="header-item">
+            <h3>
+                WEFUNDUS LOGS
+            </h3>
+        </div>
+        <div class="header-item logs-count border-left">
+            <h3 id="logFetched"></h3>
+            <h3 style="font-weight: bold;">of</h3>
+            <h3 id="totalLogs"></h3>
+        </div>
+        <div class="header-item border-left">
+            <div class="filter">
+                <h3>Status</h3>
+                <select id="logFilter">
+                    <option value="0">All</option>
+                    <option value="1">Success</option>
+                    <option value="3">Failed</option>
+                    <option value="2">Error</option>
+                    <option value="4">Info</option>
+                </select>
+            </div>
+        </div>
+        <div class="header-item border-left">
+            <h3><input id="searchApi" type="text" placeholder="/api/v1/app/order/payment-status"></h3>
+            <h3><button id="searchApiBtn">Search Api</button></h3>
+        </div>
+        <div class="header-item border-left">
+            <h3>
+                <button id="avgCTime">
+                    Get Avg Compile Time
+                </button>
+            </h3>
+        </div>
+    </div>
+
+    <div class="container">
+        <h1 id="noDataFound" style="display: none;text-align: center;">No Data Found</h1>
+        <div class="log-container" id="logContainer">
+        </div>
+    </div>
+    <div class="footer" id="footer">
+        Design and developed By <b>Pukhraj saini</b> with <b class="heart">&#10084;</b>
+        <a class="mc" href="https://mobilecoderz.com/" target="_blank">Mobilecoderz</a>
+    </div>
+</body>
+
+</html>
+
+<script>
+    let logs = [];
+    const baseUrl = '/logs';
+    let limit = 200;
+    let lastDate;
+    let minDate;
+    let noData = false;
+    let selectedStatus = 0;
+    let searchApiValue = undefined;
+    let totalCompliedTime = 0;
+
+    const logsContainer = document.getElementById('logContainer');
+    const noDataFount = document.getElementById('noDataFound');
+    const footer = document.getElementById('footer');
+    async function getLogs() {
+        let url = `${baseUrl}/list?limit=${limit}`;
+        if (minDate)
+            url = `${url}&lt=${minDate}`;
+        selectedStatus = Number(localStorage.getItem('selectedStatus'));
+        if (selectedStatus) {
+            url = `${url}&execStatus=${selectedStatus}`;
+            document.getElementById('logFilter').value = selectedStatus;
+        }
+
+        if (searchApiValue) url = `${url}&search=${searchApiValue}`;
+
+        const res = await fetch(url);
+        const data = await res.json();
+        const dataList = data.data.list;
+        if (dataList.length > 1) {
+            noData = false;
+            logs.push(...dataList);
+            minDate = logs[logs.length - 1].createdAt;
+            createRows(logs);
+            document.getElementById('logFetched').innerText = logs.length || 0;
+            document.getElementById('totalLogs').innerHTML = data.data.count || 0;
+            noDataFount.style.display = 'none';
+        }
+        else {
+            noData = true
+        }
+        if (logs.length === 0) noDataFount.style.display = 'block';
+
+    }
+
+    getLogs();
+
+    function createRows(data) {
+        data.forEach((e, i) => {
+            const element = document.createElement('div');
+            element.classList.add('log');
+            element.innerHTML = getLog(e, i);
+            logsContainer.appendChild(element);
+            totalCompliedTime = totalCompliedTime + e.execTime;
+        });
+    }
+
+    function getLog(log, i) {
+        return `<div class="api">
+    <div class="method ${log.method.toLowerCase()}"> <span class="sn"> ${i + 1}. </span> &nbsp; ${log.method}</div>
+    <div class="mid">
+        <span class="api-url">
+            ${log.api}
+        </span>
+        <span>
+            Date: <b>${new Date(log.createdAt).toLocaleString()}</b>
+            compiled in : <b> ${log.execTime}ms</b>
+        </span>
+    </div>
+    ${getLogStatus(log.execStatus)}
+</div>
+${getLogContent(log, i)}
+`;
+    }
+    function getLogStatus(execStatus) {
+        if (execStatus === 2)
+            return `<div class="status error"> Error</div>`;
+        if (execStatus === 3)
+            return `<div class="status failed"> Failed</div>`;
+        if (execStatus === 4)
+            return `<div class="status info"> Info</div>`;
+        return `<div class="status success"> Success</div>`;
+    }
+
+
+    function getLogContent(log, i) {
+        let logContent = `<div class="content">
+    <div class="msg-box">
+        <span class="mgs">${log?.message}</span>,
+        <span class="user"> <b>User</b> ${log?.user}</span>,
+        <span class="session"> <b>Session</b> ${log?.session} </span>,
+        <span class="session"> <b>StatusCode</b> ${log?.status} </span>,
+    </div>
+    `;
+
+        if (log.execStatus !== 1) {
+            logContent = `${logContent}
+        <div class="data-box">
+        <pre class="p-json">
+${log?.data}
+</pre>
+        <div class="copy">
+            <button onClick="copyCode(${i})">Copy</button>
+        </div>
+    </div>
+</div>
+        `
+        }
+
+        return logContent;
+    }
+
+
+    function copyCode(event) {
+        navigator.clipboard.writeText(logs[event].data);
+    }
+
+
+    function handleScroll() {
+        window.onscroll = () => {
+            const pos = window.scrollY;
+            const height = window.innerHeight;
+            const scrollTop = document.documentElement.scrollHeight;
+            if (height + pos >= scrollTop && !noData) {
+                getLogs();
+            }
+        }
+    }
+    handleScroll();
+
+    function handleLogFilter() {
+        document.getElementById('logFilter').addEventListener('change', event => {
+            selectedStatus = Number(event.target.value);
+            localStorage.setItem('selectedStatus', selectedStatus)
+            noData = false;
+            logs = [];
+            minDate = undefined;
+            logsContainer.replaceChildren()
+            getLogs();
+        });
+    }
+
+
+    function HandleSearchApi() {
+        document.getElementById('searchApiBtn').addEventListener('click', event => {
+            const value = document.getElementById('searchApi').value;
+            if (!value.trim()) return;
+            searchApiValue = value;
+            noData = false;
+            logs = [];
+            minDate = undefined;
+            logsContainer.replaceChildren()
+            getLogs();
+        });
+    }
+
+    handleLogFilter();
+    HandleSearchApi();
+
+
+    function GetAvgExecTime() {
+        const sum = logs.reduce((a, e) => {
+            a = a + e.execTime;
+            return a;
+        }, 0);
+        return Math.ceil(sum / logs.length);
+    }
+
+    function getAverageCompileTime() {
+        const btn = document.getElementById('avgCTime');
+        btn.addEventListener('click', event => {
+            btn.innerHTML = `Avg complied time : ${GetAvgExecTime()} ms`;
+        });
+    }
+
+    getAverageCompileTime();
+
+
+    function movingFooter() {
+        setInterval(() => {
+            // const value = `${Math.ceil(Math.random() * 500)}px !important`;
+            // footer.style.right = value;
+            const colors = ['red', 'green', 'blue', 'black', 'green', 'purple']
+            footer.style.backgroundColor = `${colors[Math.ceil(Math.random() * 6)]}`;
+        }, 60000);
+    }
+
+    movingFooter();
+
+</script>
